@@ -6,7 +6,7 @@ export default class DropZoneS extends Component {
 
   render() {
     return (
-      <div>
+      <div className="dropZoneContainer">
         <Dropzone
           onDrop={acceptedFiles => {
             const reader = new FileReader();
@@ -22,7 +22,7 @@ export default class DropZoneS extends Component {
             <section>
               <div {...getRootProps()}>
                 <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p className="dragStyle">Drag 'n' drop some files here, or click to select files</p>
               </div>
             </section>
           )}

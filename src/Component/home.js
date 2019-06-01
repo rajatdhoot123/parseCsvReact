@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import DropZoneS from "./dropzone";
 import { Table, FormControl, Button } from "react-bootstrap";
+import { sortData, formatData, getSearchList } from "./utils";
 
 const heading = {
   heading: [
@@ -13,47 +14,6 @@ const heading = {
     "Global_Sales",
     ""
   ]
-};
-
-const sortData = (data, type) => {
-  const [first, ...rest] = data;
-  let remainingVales = [];
-  let filteredData = rest
-    .filter(game => {
-      if (!isNaN(Number(Object.values(game)[0][3]))) {
-        return true;
-      } else {
-        remainingVales = [...remainingVales, game];
-      }
-    })
-    .sort(
-      (a, b) => Number(Object.values(type == "asc" ? a : b)[0][3]) - Number(Object.values(type == "asc" ? b : a)[0][3])
-    );
-
-  return [...filteredData, ...remainingVales];
-};
-
-const formatData = data => {
-  let formattedArray = [];
-  for (let i = 0; i < data.length; i++) {
-    if (i == 0) {
-      formattedArray.push({ [`heading`]: data[i] });
-      localStorage[`heading`] = JSON.stringify(data[i]);
-    } else {
-      formattedArray.push({ [`GAME-${data[i][1]}`]: data[i] });
-      localStorage[`GAME-${data[i][1]}`] = JSON.stringify(data[i]);
-    }
-  }
-  return formattedArray;
-};
-
-const getSearchList = (text, data) => {
-  let regex = new RegExp(text);
-  return data.filter(game =>
-    Object.keys(game)[0]
-      .toLocaleUpperCase()
-      .match(regex)
-  );
 };
 
 export default class Home extends Component {
@@ -80,7 +40,8 @@ export default class Home extends Component {
 
   handleData = (data, cb) => {
     this.setState({
-      data: formatData(data)
+      data: formatData(data),
+      searchList: [heading]
     });
   };
 
@@ -120,6 +81,7 @@ export default class Home extends Component {
     const sortText = this.state.sortAsc ? "asc" : "desc";
     return (
       <div>
+        <DropZoneS handleData={this.handleData} />
         <div style={{ padding: 20 }}>
           <FormControl
             className="p3"
@@ -127,17 +89,17 @@ export default class Home extends Component {
             placeholder="Search"
           />
         </div>
-        <Table striped bordered hover>
+        <Table responsive striped bordered hover>
           <thead>
             <tr>
               <th>{heading[0]}</th>
               <th>{heading[1]}</th>
               <th>{heading[2]}</th>
-              <th style={{display:"flex"}}>
+              <th style={{ display: "flex" }}>
                 {heading[3]}{" "}
                 <Button
                   variant="link"
-                  style={{padding: 0, marginLeft: "5px"}}
+                  style={{ padding: 0, marginLeft: "5px" }}
                   onClick={this.handleSort.bind(this, sortText)}
                 >
                   {sortText}
@@ -152,7 +114,10 @@ export default class Home extends Component {
             {rest.map(games => {
               let game = Object.values(games)[0];
               return (
-                <tr key={game[0]}>
+                <tr
+                  key={game[0]}
+                  onClick={this.props.handlePageChange.bind(this, game)}
+                >
                   <td>{game[0]}</td>
                   <td>{game[1]}</td>
                   <td>{game[2]}</td>
@@ -166,7 +131,6 @@ export default class Home extends Component {
             })}
           </tbody>
         </Table>
-        <DropZoneS handleData={this.handleData} />
       </div>
     );
   }

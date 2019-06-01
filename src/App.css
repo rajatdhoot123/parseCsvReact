@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  padding: 1em
 }
 
 .App-logo {
@@ -21,6 +22,16 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.dragStyle {
+  margin-top: 0;
+  margin: 1rem;
+}
+
+.dropZoneContainer {
+  border: 1px solid;
+  border-style: dashed;
 }
 
 @keyframes App-logo-spin {
