@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import DropZoneS from "./dropzone";
-import { Table, FormControl } from "react-bootstrap";
+import { Table, FormControl, Button } from "react-bootstrap";
 
 const heading = {
-  heading: JSON.stringify([
+  heading: [
     "Rank",
     "Name",
     "Platform",
@@ -12,17 +12,21 @@ const heading = {
     "Publisher",
     "Global_Sales",
     ""
-  ])
+  ]
+};
+
+const sortData = data => {
+  console.warn(data);
 };
 
 const formatData = data => {
   let formattedArray = [];
   for (let i = 0; i < data.length; i++) {
     if (i == 0) {
-      formattedArray.push({ [`heading`]: JSON.stringify(data[i]) });
+      formattedArray.push({ [`heading`]: data[i] });
       localStorage[`heading`] = JSON.stringify(data[i]);
     } else {
-      formattedArray.push({ [`GAME-${data[i][1]}`]: JSON.stringify(data[i]) });
+      formattedArray.push({ [`GAME-${data[i][1]}`]: data[i] });
       localStorage[`GAME-${data[i][1]}`] = JSON.stringify(data[i]);
     }
   }
@@ -53,7 +57,7 @@ export default class Home extends Component {
           .filter(key => key.match(/^GAME/))
           .map(game => {
             let parseGame = JSON.parse(localStorage[game]);
-            return { [`GAME-${parseGame[1]}`]: localStorage[game] };
+            return { [`GAME-${parseGame[1]}`]: parseGame };
           })
       ]
     });
@@ -82,15 +86,19 @@ export default class Home extends Component {
     );
   };
 
+  handleSort = () => {
+    sortData(this.state.data);
+  };
+
   render() {
+    console.warn({ state: this.state });
     const [first = {}, ...rest] =
       this.state.searchList.length > 1
         ? this.state.searchList
         : this.state.data;
-    console.warn({ state: this.state });
     let heading = [];
     if (Object.keys(first).length) {
-      heading = JSON.parse(first.heading);
+      heading = first.heading;
     }
     return (
       <div>
@@ -107,7 +115,12 @@ export default class Home extends Component {
               <th>{heading[0]}</th>
               <th>{heading[1]}</th>
               <th>{heading[2]}</th>
-              <th>{heading[3]}</th>
+              <th>
+                {heading[3]}{" "}
+                <Button variant="link" onClick={this.handleSort}>
+                  Ace
+                </Button>
+              </th>
               <th>{heading[4]}</th>
               <th>{heading[5]}</th>
               <th>{heading[6]}</th>
@@ -115,7 +128,7 @@ export default class Home extends Component {
           </thead>
           <tbody>
             {rest.map(games => {
-              let game = JSON.parse(Object.values(games)[0]);
+              let game = Object.values(games)[0];
               return (
                 <tr key={game[0]}>
                   <td>{game[0]}</td>
