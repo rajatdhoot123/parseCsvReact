@@ -15,8 +15,22 @@ const heading = {
   ]
 };
 
-const sortData = data => {
-  console.warn(data);
+const sortData = (data, type) => {
+  const [first, ...rest] = data;
+  let remainingVales = [];
+  let filteredData = rest
+    .filter(game => {
+      if (!isNaN(Number(Object.values(game)[0][3]))) {
+        return true;
+      } else {
+        remainingVales = [...remainingVales, game];
+      }
+    })
+    .sort(
+      (a, b) => Number(Object.values(type == "asc" ? a : b)[0][3]) - Number(Object.values(type == "asc" ? b : a)[0][3])
+    );
+
+  return [...filteredData, ...remainingVales];
 };
 
 const formatData = data => {
@@ -46,7 +60,8 @@ export default class Home extends Component {
   state = {
     data: [heading],
     searchList: [heading],
-    searchText: ""
+    searchText: "",
+    sortAsc: true
   };
 
   componentDidMount() {
@@ -86,12 +101,14 @@ export default class Home extends Component {
     );
   };
 
-  handleSort = () => {
-    sortData(this.state.data);
+  handleSort = text => {
+    this.setState(prevState => ({
+      searchList: [heading, ...sortData(this.state.data, text)],
+      sortAsc: !prevState.sortAsc
+    }));
   };
 
   render() {
-    console.warn({ state: this.state });
     const [first = {}, ...rest] =
       this.state.searchList.length > 1
         ? this.state.searchList
@@ -100,6 +117,7 @@ export default class Home extends Component {
     if (Object.keys(first).length) {
       heading = first.heading;
     }
+    const sortText = this.state.sortAsc ? "asc" : "desc";
     return (
       <div>
         <div style={{ padding: 20 }}>
@@ -115,10 +133,14 @@ export default class Home extends Component {
               <th>{heading[0]}</th>
               <th>{heading[1]}</th>
               <th>{heading[2]}</th>
-              <th>
+              <th style={{display:"flex"}}>
                 {heading[3]}{" "}
-                <Button variant="link" onClick={this.handleSort}>
-                  Ace
+                <Button
+                  variant="link"
+                  style={{padding: 0, marginLeft: "5px"}}
+                  onClick={this.handleSort.bind(this, sortText)}
+                >
+                  {sortText}
                 </Button>
               </th>
               <th>{heading[4]}</th>
